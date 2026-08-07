@@ -1,10 +1,14 @@
-import { Pool } from 'pg';
+import { Pool, types } from 'pg';
 
 const connectionString = process.env.DATABASE_URL;
 
 if (!connectionString) {
   throw new Error('DATABASE_URL environment variable is not set');
 }
+
+// DATE (OID 1082) defaults to parsing into a JS Date at local midnight, which shifts
+// the calendar day once serialized to UTC. Keep it as the raw 'YYYY-MM-DD' string.
+types.setTypeParser(1082, (value) => value);
 
 export const pool = new Pool({
   connectionString,
