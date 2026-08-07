@@ -55,3 +55,10 @@ export function requireRole(...roles: UserRole[]) {
     next();
   };
 }
+
+export function requireAuthContext(req: Request): NonNullable<Request['auth']> {
+  if (!req.auth) {
+    throw new HttpError(401, 'UNAUTHENTICATED', 'Missing authentication context');
+  }
+  return req.auth;
+}

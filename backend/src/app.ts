@@ -3,6 +3,7 @@ import express, { Application } from 'express';
 import { rateLimit } from 'express-rate-limit';
 import helmet from 'helmet';
 import { errorHandler } from './middleware/errorHandler';
+import analyticsRoutes from './routes/analyticsRoutes';
 import authRoutes from './routes/authRoutes';
 import tripRoutes from './routes/tripRoutes';
 
@@ -26,6 +27,7 @@ app.get('/health', (_req, res) => {
 
 app.use('/api/auth', authRoutes);
 app.use('/api/trips', tripRoutes);
+app.use('/api/analytics', analyticsRoutes);
 
 app.use(errorHandler);
 

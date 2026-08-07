@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import { z } from 'zod';
-import { HttpError } from '../middleware/errorHandler';
+import { requireAuthContext } from '../middleware/auth';
 import * as tripService from '../services/tripService';
 
 const transportTypeEnum = z.enum(['CAR', 'BUS', 'TRAIN', 'FLIGHT']);
@@ -39,13 +39,6 @@ export const tripInputSchema = z
   .transform((data) => ({ ...data, fuelType: data.fuelType ?? null }));
 
 const tripIdParamSchema = z.uuid();
-
-function requireAuthContext(req: Request) {
-  if (!req.auth) {
-    throw new HttpError(401, 'UNAUTHENTICATED', 'Missing authentication context');
-  }
-  return req.auth;
-}
 
 function requireTripId(req: Request): string {
   return tripIdParamSchema.parse(req.params.tripId);
