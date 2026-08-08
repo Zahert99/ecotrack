@@ -8,27 +8,25 @@ import {
   TransportBreakdown,
 } from '../repositories/analyticsRepository';
 import { UserRole } from '../repositories/userRepository';
+import { resolveCompanyScope } from './scopeResolver';
 
 interface Requester {
   userId: string;
   role: UserRole;
-}
-
-function resolveScope(requester: Requester): string | null {
-  return requester.role === 'ADMIN' ? null : requester.userId;
+  canViewCompanyData: boolean;
 }
 
 export async function getSummary(companyId: string, requester: Requester): Promise<MonthlySummary> {
-  return getMonthlySummary(pool, companyId, resolveScope(requester));
+  return getMonthlySummary(pool, companyId, resolveCompanyScope(requester));
 }
 
 export async function getByTransport(
   companyId: string,
   requester: Requester,
 ): Promise<TransportBreakdown[]> {
-  return getBreakdownByTransport(pool, companyId, resolveScope(requester));
+  return getBreakdownByTransport(pool, companyId, resolveCompanyScope(requester));
 }
 
 export async function getTrends(companyId: string, requester: Requester): Promise<MonthlyTrend[]> {
-  return getMonthlyTrends(pool, companyId, resolveScope(requester));
+  return getMonthlyTrends(pool, companyId, resolveCompanyScope(requester));
 }

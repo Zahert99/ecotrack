@@ -1,7 +1,8 @@
 import { NextFunction, Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import { getJwtSecret } from '../config/jwtConfig';
-import { UserRole } from '../repositories/userRepository';
+import { pool } from '../database/pool';
+import { findCanViewCompanyDataById, UserRole } from '../repositories/userRepository';
 import { HttpError } from './errorHandler';
 
 interface AccessTokenClaims {
@@ -20,7 +21,7 @@ function isAccessTokenClaims(payload: unknown): payload is AccessTokenClaims {
   );
 }
 
-export function requireAuth(req: Request, _res: Response, next: NextFunction): void {
+export async function requireAuth(req: Request, _res: Response, next: NextFunction): Promise<void> {
   const header = req.header('Authorization');
   const token = header?.startsWith('Bearer ') ? header.slice('Bearer '.length) : undefined;
 
@@ -42,7 +43,25 @@ export function requireAuth(req: Request, _res: Response, next: NextFunction): v
     return;
   }
 
-  req.auth = { userId: payload.sub, companyId: payload.companyId, role: payload.role };
+  let canViewCompanyData: boolean | null;
+  try {
+    canViewCompanyData = await findCanViewCompanyDataById(pool, payload.sub);
+  } catch (err) {
+    next(err);
+    return;
+  }
+
+  if (canViewCompanyData === null) {
+    next(new HttpError(401, 'UNAUTHENTICATED', 'Account no longer exists'));
+    return;
+  }
+
+  req.auth = {
+    userId: payload.sub,
+    companyId: payload.companyId,
+    role: payload.role,
+    canViewCompanyData,
+  };
   next();
 }
 

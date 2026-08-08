@@ -5,7 +5,9 @@ import helmet from 'helmet';
 import { errorHandler } from './middleware/errorHandler';
 import analyticsRoutes from './routes/analyticsRoutes';
 import authRoutes from './routes/authRoutes';
+import permissionRequestRoutes from './routes/permissionRequestRoutes';
 import tripRoutes from './routes/tripRoutes';
+import userRoutes from './routes/userRoutes';
 
 const app: Application = express();
 
@@ -28,6 +30,8 @@ app.get('/health', (_req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/trips', tripRoutes);
 app.use('/api/analytics', analyticsRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/permission-requests', permissionRequestRoutes);
 
 app.use(errorHandler);
 

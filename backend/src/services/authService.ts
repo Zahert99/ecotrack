@@ -2,34 +2,29 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { DatabaseError } from 'pg';
 import { getJwtSecret } from '../config/jwtConfig';
+import { BCRYPT_COST } from '../config/passwordConfig';
 import { pool } from '../database/pool';
+import { UNIQUE_VIOLATION } from '../database/pgErrorCodes';
 import { withTransaction } from '../database/withTransaction';
 import { HttpError } from '../middleware/errorHandler';
 import { insertCompany } from '../repositories/companyRepository';
-import { findUserByEmail, insertUser, User } from '../repositories/userRepository';
+import {
+  findUserByEmail,
+  insertUser,
+  PublicUser,
+  toPublicUser,
+  User,
+} from '../repositories/userRepository';
 
-const BCRYPT_COST = 12;
 const TOKEN_TTL = '24h';
-const UNIQUE_VIOLATION = '23505';
 
 function issueToken(userId: string, companyId: string, role: string): string {
   return jwt.sign({ companyId, role }, getJwtSecret(), { subject: userId, expiresIn: TOKEN_TTL });
 }
 
-function toPublicUser(user: User) {
-  return {
-    id: user.id,
-    companyId: user.companyId,
-    email: user.email,
-    firstName: user.firstName,
-    lastName: user.lastName,
-    role: user.role,
-  };
-}
-
 interface AuthResult {
   token: string;
-  user: ReturnType<typeof toPublicUser>;
+  user: PublicUser;
 }
 
 export async function signup(params: {
