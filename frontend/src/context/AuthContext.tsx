@@ -42,6 +42,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const token = getToken();
     const storedUser = window.localStorage.getItem(USER_STORAGE_KEY);
     if (token && storedUser) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- hydrating auth from localStorage; must run client-only post-mount since there's no window during SSR
       setUser(JSON.parse(storedUser) as PublicUser);
     }
     setIsLoading(false);
