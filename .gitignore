@@ -8,3 +8,4 @@ npm-debug.log*
 coverage/
 *.tsbuildinfo
 .claude/settings.local.json
+CLAUDE.md
