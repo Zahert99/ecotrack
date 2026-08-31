@@ -1,27 +1,29 @@
 @import "tailwindcss";
 
 /*
- * Placeholder palette — swap for the real "EcoTrack Emissions Dashboard"
- * Stitch values once the Stitch MCP connection is live (see CLAUDE.md).
- * Every color in the app should come from one of these tokens; no raw
- * hex codes in component files.
+ * "EcoTrack" design system, exported from the Stitch "EcoTrack Emissions
+ * Dashboard" project (Corporate Modern / Enterprise Green). Every color in
+ * the app should come from one of these tokens; no raw hex codes in
+ * component files.
  */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #f8f9ff;
+  --foreground: #0b1c30;
 
-  --primary: #16a34a;
+  --primary: #064e3b;
   --primary-foreground: #ffffff;
-  --secondary: #0f766e;
+  --secondary: #006c49;
   --secondary-foreground: #ffffff;
-  --accent: #22c55e;
-  --accent-foreground: #052e16;
+  --accent: #ecfdf5;
+  --accent-foreground: #00714d;
 
-  --muted: #f4f4f5;
-  --muted-foreground: #71717a;
-  --border: #e4e4e7;
-  --destructive: #dc2626;
+  --muted: #eff4ff;
+  --muted-foreground: #404944;
+  --border: #e2e8f0;
+  --destructive: #ba1a1a;
   --destructive-foreground: #ffffff;
+  --destructive-muted: #ffdad6;
+  --destructive-muted-foreground: #93000a;
 }
 
 @theme inline {
@@ -40,18 +42,20 @@
   --color-border: var(--border);
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
+  --color-destructive-muted: var(--destructive-muted);
+  --color-destructive-muted-foreground: var(--destructive-muted-foreground);
 
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-inter);
   --font-mono: var(--font-geist-mono);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-    --muted: #18181b;
-    --muted-foreground: #a1a1aa;
-    --border: #27272a;
+    --background: #0f1a2b;
+    --foreground: #eaf1ff;
+    --muted: #1c2a3f;
+    --muted-foreground: #a7b2c9;
+    --border: #2b3b52;
   }
 }
 
