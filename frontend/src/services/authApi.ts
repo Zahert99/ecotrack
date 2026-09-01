@@ -22,13 +22,13 @@ export interface LoginInput {
 export function signup(input: SignupInput): Promise<AuthResponse> {
   return apiRequest<AuthResponse>("/api/auth/signup", {
     method: "POST",
-    body: JSON.stringify(input),
+    data: input,
   });
 }
 
 export function login(input: LoginInput): Promise<AuthResponse> {
   return apiRequest<AuthResponse>("/api/auth/login", {
     method: "POST",
-    body: JSON.stringify(input),
+    data: input,
   });
 }

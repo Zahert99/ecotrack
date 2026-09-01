@@ -1,3 +1,5 @@
+import axios from "axios";
+
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 if (!API_URL) {
@@ -48,30 +50,43 @@ interface ApiErrorBody {
   };
 }
 
-export async function apiRequest<T>(path: string, options: RequestInit = {}): Promise<T> {
+const client = axios.create({ baseURL: API_URL });
+
+client.interceptors.request.use((config) => {
   const token = getToken();
-  const headers = new Headers(options.headers);
-  headers.set("Content-Type", "application/json");
   if (token) {
-    headers.set("Authorization", `Bearer ${token}`);
+    config.headers.set("Authorization", `Bearer ${token}`);
   }
+  return config;
+});
 
-  const response = await fetch(`${API_URL}${path}`, { ...options, headers });
+interface ApiRequestOptions {
+  method?: string;
+  data?: unknown;
+}
 
-  if (response.status === 204) {
-    return undefined as T;
-  }
+export async function apiRequest<T>(path: string, options: ApiRequestOptions = {}): Promise<T> {
+  try {
+    const response = await client.request<{ data: T }>({
+      url: path,
+      method: options.method ?? "GET",
+      data: options.data,
+    });
 
-  const body = await response.json();
-
-  if (!response.ok) {
-    const { message, code, issues } = (body as ApiErrorBody).error;
-    if (response.status === 401) {
-      clearToken();
-      unauthorizedHandler?.();
+    if (response.status === 204) {
+      return undefined as T;
     }
-    throw new ApiError(response.status, code, message, issues);
-  }
 
-  return (body as { data: T }).data;
+    return response.data.data;
+  } catch (err) {
+    if (axios.isAxiosError(err) && err.response) {
+      const { message, code, issues } = (err.response.data as ApiErrorBody).error;
+      if (err.response.status === 401) {
+        clearToken();
+        unauthorizedHandler?.();
+      }
+      throw new ApiError(err.response.status, code, message, issues);
+    }
+    throw err;
+  }
 }
