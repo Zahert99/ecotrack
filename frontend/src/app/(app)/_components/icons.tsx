@@ -51,6 +51,24 @@ export function SettingsIcon(props: SVGProps<SVGSVGElement>) {
   );
 }
 
+export function TrendingUpIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <Icon {...props}>
+      <path d="M3.75 16.5 10 10.25l4 4 6.25-6.25" />
+      <path d="M15.5 8h4.75v4.75" />
+    </Icon>
+  );
+}
+
+export function TrendingDownIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <Icon {...props}>
+      <path d="M3.75 7.5 10 13.75l4-4 6.25 6.25" />
+      <path d="M15.5 16h4.75v-4.75" />
+    </Icon>
+  );
+}
+
 export function LogoutIcon(props: SVGProps<SVGSVGElement>) {
   return (
     <Icon {...props}>
