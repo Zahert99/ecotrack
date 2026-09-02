@@ -119,6 +119,21 @@ export async function listTripsForUser(
   return result.rows.map(toTrip);
 }
 
+export async function findTripsByIds(
+  client: Pool | PoolClient,
+  companyId: string,
+  tripIds: string[],
+): Promise<Trip[]> {
+  if (tripIds.length === 0) {
+    return [];
+  }
+  const result = await client.query<TripRow>(
+    `SELECT ${SELECT_COLUMNS} FROM trips WHERE company_id = $1 AND id = ANY($2::uuid[])`,
+    [companyId, tripIds],
+  );
+  return result.rows.map(toTrip);
+}
+
 export async function updateTrip(
   client: Pool | PoolClient,
   companyId: string,

@@ -6,6 +6,8 @@ import { errorHandler } from './middleware/errorHandler';
 import analyticsRoutes from './routes/analyticsRoutes';
 import authRoutes from './routes/authRoutes';
 import permissionRequestRoutes from './routes/permissionRequestRoutes';
+import tripEditRequestAdminRoutes from './routes/tripEditRequestAdminRoutes';
+import tripEditRequestRoutes from './routes/tripEditRequestRoutes';
 import tripRoutes from './routes/tripRoutes';
 import userRoutes from './routes/userRoutes';
 
@@ -28,10 +30,12 @@ app.get('/health', (_req, res) => {
 });
 
 app.use('/api/auth', authRoutes);
+app.use('/api/trips/:tripId/edit-requests', tripEditRequestRoutes);
 app.use('/api/trips', tripRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/permission-requests', permissionRequestRoutes);
+app.use('/api/trip-edit-requests', tripEditRequestAdminRoutes);
 
 app.use(errorHandler);
 
