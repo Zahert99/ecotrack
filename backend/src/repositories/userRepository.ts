@@ -142,13 +142,16 @@ export async function updateCanViewCompanyData(
   return result.rows[0] ? toUser(result.rows[0]) : null;
 }
 
-export async function findCanViewCompanyDataById(
+export async function findAuthProfileById(
   client: Pool | PoolClient,
   userId: string,
-): Promise<boolean | null> {
-  const result = await client.query<{ can_view_company_data: boolean }>(
-    'SELECT can_view_company_data FROM users WHERE id = $1',
+): Promise<{ role: UserRole; canViewCompanyData: boolean } | null> {
+  const result = await client.query<{ role: UserRole; can_view_company_data: boolean }>(
+    'SELECT role, can_view_company_data FROM users WHERE id = $1',
     [userId],
   );
-  return result.rows[0] ? result.rows[0].can_view_company_data : null;
+  if (!result.rows[0]) {
+    return null;
+  }
+  return { role: result.rows[0].role, canViewCompanyData: result.rows[0].can_view_company_data };
 }

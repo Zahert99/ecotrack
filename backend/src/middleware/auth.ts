@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import { getJwtSecret } from '../config/jwtConfig';
 import { pool } from '../database/pool';
-import { findCanViewCompanyDataById, UserRole } from '../repositories/userRepository';
+import { findAuthProfileById, UserRole } from '../repositories/userRepository';
 import { HttpError } from './errorHandler';
 
 interface AccessTokenClaims {
@@ -43,15 +43,15 @@ export async function requireAuth(req: Request, _res: Response, next: NextFuncti
     return;
   }
 
-  let canViewCompanyData: boolean | null;
+  let authProfile: { role: UserRole; canViewCompanyData: boolean } | null;
   try {
-    canViewCompanyData = await findCanViewCompanyDataById(pool, payload.sub);
+    authProfile = await findAuthProfileById(pool, payload.sub);
   } catch (err) {
     next(err);
     return;
   }
 
-  if (canViewCompanyData === null) {
+  if (authProfile === null) {
     next(new HttpError(401, 'UNAUTHENTICATED', 'Account no longer exists'));
     return;
   }
@@ -59,8 +59,8 @@ export async function requireAuth(req: Request, _res: Response, next: NextFuncti
   req.auth = {
     userId: payload.sub,
     companyId: payload.companyId,
-    role: payload.role,
-    canViewCompanyData,
+    role: authProfile.role,
+    canViewCompanyData: authProfile.canViewCompanyData,
   };
   next();
 }
