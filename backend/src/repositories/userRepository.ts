@@ -155,3 +155,19 @@ export async function findAuthProfileById(
   }
   return { role: result.rows[0].role, canViewCompanyData: result.rows[0].can_view_company_data };
 }
+
+export async function updateUserRole(
+  client: Pool | PoolClient,
+  companyId: string,
+  userId: string,
+  role: UserRole,
+): Promise<User | null> {
+  const result = await client.query<UserRow>(
+    `UPDATE users
+     SET role = $3
+     WHERE company_id = $1 AND id = $2
+     RETURNING ${SELECT_COLUMNS}`,
+    [companyId, userId, role],
+  );
+  return result.rows[0] ? toUser(result.rows[0]) : null;
+}

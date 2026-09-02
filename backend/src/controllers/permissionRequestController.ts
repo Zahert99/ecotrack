@@ -9,6 +9,12 @@ export const resolvePermissionRequestSchema = z
   })
   .strict();
 
+export const createPermissionRequestSchema = z
+  .object({
+    type: z.enum(['VIEW_COMPANY_DATA', 'ADMIN_ROLE']).default('VIEW_COMPANY_DATA'),
+  })
+  .strict();
+
 const permissionRequestIdParamSchema = z.uuid();
 
 function requirePermissionRequestId(req: Request): string {
@@ -18,7 +24,11 @@ function requirePermissionRequestId(req: Request): string {
 export async function create(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     const auth = requireAuthContext(req);
-    const request = await permissionRequestService.createRequest(auth.companyId, auth);
+    const request = await permissionRequestService.createRequest(
+      auth.companyId,
+      auth,
+      req.body.type,
+    );
     res.status(201).json({ data: request });
   } catch (err) {
     next(err);
