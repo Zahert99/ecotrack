@@ -2,6 +2,7 @@ export type TransportType = "CAR" | "BUS" | "TRAIN" | "FLIGHT";
 export type FuelType = "PETROL" | "DIESEL" | "HYBRID" | "ELECTRIC";
 export type Role = "ADMIN" | "USER";
 export type PermissionRequestStatus = "PENDING" | "APPROVED" | "REJECTED";
+export type PermissionRequestType = "VIEW_COMPANY_DATA" | "ADMIN_ROLE";
 
 export interface PublicUser {
   id: string;
@@ -56,7 +57,28 @@ export interface PermissionRequest {
   id: string;
   companyId: string;
   userId: string;
+  requestType: PermissionRequestType;
   status: PermissionRequestStatus;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface MyPermissionRequestStatus {
+  viewCompanyData: PermissionRequest | null;
+  adminRole: PermissionRequest | null;
+}
+
+export interface TripEditRequest {
+  id: string;
+  tripId: string;
+  companyId: string;
+  requestedBy: string;
+  status: PermissionRequestStatus;
+  proposedTransportType: TransportType;
+  proposedFuelType: FuelType | null;
+  proposedDistanceKm: number;
+  proposedPassengerCount: number;
+  proposedDate: string;
   createdAt: string;
   updatedAt: string;
 }
