@@ -6,7 +6,6 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ConfirmationModal } from "@/components/ConfirmationModal";
 import { deleteTrip, listTrips } from "@/services/tripsApi";
 import type { Trip } from "@/types/api";
-import { AccessRequestPanel } from "./_components/AccessRequestPanel";
 import { FilterBar, type TripFilters } from "./_components/FilterBar";
 import { ProposeEditModal } from "./_components/ProposeEditModal";
 import { TripsMobileList } from "./_components/TripsMobileList";
@@ -59,8 +58,6 @@ export default function TripsPage() {
           + Log New Travel
         </Link>
       </div>
-
-      <AccessRequestPanel />
 
       <FilterBar filters={filters} onChange={setFilters} />
 
