@@ -82,3 +82,7 @@ export interface TripEditRequest {
   createdAt: string;
   updatedAt: string;
 }
+
+export interface TripEditRequestWithTrip extends TripEditRequest {
+  trip: Trip | null;
+}
