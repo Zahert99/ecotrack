@@ -24,6 +24,11 @@
   --destructive-foreground: #ffffff;
   --destructive-muted: #ffdad6;
   --destructive-muted-foreground: #93000a;
+
+  --chart-1: #064e3b;
+  --chart-2: #10b981;
+  --chart-3: #38bdf8;
+  --chart-4: #f59e0b;
 }
 
 @theme inline {
@@ -44,6 +49,11 @@
   --color-destructive-foreground: var(--destructive-foreground);
   --color-destructive-muted: var(--destructive-muted);
   --color-destructive-muted-foreground: var(--destructive-muted-foreground);
+
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
 
   --font-sans: var(--font-inter);
   --font-mono: var(--font-geist-mono);

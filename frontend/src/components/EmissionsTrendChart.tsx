@@ -11,9 +11,29 @@ import {
 } from "chart.js";
 import { Bar } from "react-chartjs-2";
 import type { MonthlyTrend } from "@/types/api";
-import { formatMonthLabel } from "./formatters";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip);
+
+const MONTH_LABELS = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec",
+];
+
+function formatMonthLabel(month: string): string {
+  const [, monthNumber] = month.split("-");
+  const index = Number(monthNumber) - 1;
+  return MONTH_LABELS[index] ?? month;
+}
 
 function readCssVar(name: string): string {
   // Canvas can't read CSS variables directly; getComputedStyle needs `document`,

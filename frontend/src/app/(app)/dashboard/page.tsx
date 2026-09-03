@@ -2,7 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { getSummary, getTrends } from "@/services/analyticsApi";
-import { EmissionsTrendChart } from "./_components/EmissionsTrendChart";
+import { EmissionsTrendChart } from "@/components/EmissionsTrendChart";
 import { KpiCard } from "./_components/KpiCard";
 import { computeDelta, formatCo2e } from "./_components/formatters";
 
