@@ -1,8 +1,8 @@
 "use client";
 
+import { Select } from "@/components/Select";
 import type { TransportType } from "@/types/api";
-import { computePresetRange, type DatePreset } from "./formatters";
-import { TransportFilterSelect } from "./TransportFilterSelect";
+import { computePresetRange, TRANSPORT_LABELS, type DatePreset } from "./formatters";
 
 export interface TripFilters {
   transportType: TransportType | "ALL";
@@ -21,6 +21,14 @@ const PRESETS: { key: DatePreset; label: string }[] = [
   { key: "thisYear", label: "This Year" },
 ];
 
+const TRANSPORT_FILTER_OPTIONS: { value: TripFilters["transportType"]; label: string }[] = [
+  { value: "ALL", label: "All Modes" },
+  { value: "CAR", label: TRANSPORT_LABELS.CAR },
+  { value: "BUS", label: TRANSPORT_LABELS.BUS },
+  { value: "TRAIN", label: TRANSPORT_LABELS.TRAIN },
+  { value: "FLIGHT", label: TRANSPORT_LABELS.FLIGHT },
+];
+
 export function FilterBar({ filters, onChange }: FilterBarProps) {
   const activePreset = PRESETS.find((preset) => {
     const range = computePresetRange(preset.key);
@@ -34,8 +42,9 @@ export function FilterBar({ filters, onChange }: FilterBarProps) {
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
         <div className="flex flex-col gap-1">
           <label className="text-xs font-medium text-muted-foreground">Transport Mode</label>
-          <TransportFilterSelect
+          <Select
             value={filters.transportType}
+            options={TRANSPORT_FILTER_OPTIONS}
             onChange={(transportType) => onChange({ ...filters, transportType })}
           />
         </div>

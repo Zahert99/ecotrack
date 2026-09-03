@@ -1,9 +1,10 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
+import { Select } from "@/components/Select";
 import { ApiError } from "@/services/api";
 import type { FuelType, Trip, TransportType, TripInput } from "@/types/api";
-import { FUEL_LABELS, TRANSPORT_LABELS } from "./formatters";
+import { FUEL_LABELS, TRANSPORT_LABELS, todayIsoDate } from "./formatters";
 import { BusIcon, CarIcon, FlightIcon, TrainIcon } from "./icons";
 
 const TRANSPORT_OPTIONS: { type: TransportType; Icon: typeof CarIcon }[] = [
@@ -14,10 +15,10 @@ const TRANSPORT_OPTIONS: { type: TransportType; Icon: typeof CarIcon }[] = [
 ];
 
 const FUEL_OPTIONS: FuelType[] = ["PETROL", "DIESEL", "HYBRID", "ELECTRIC"];
-
-function today(): string {
-  return new Date().toISOString().slice(0, 10);
-}
+const FUEL_SELECT_OPTIONS = FUEL_OPTIONS.map((option) => ({
+  value: option,
+  label: FUEL_LABELS[option],
+}));
 
 interface TripFormProps {
   initialValues?: Trip;
@@ -35,7 +36,7 @@ export function TripForm({ initialValues, submitLabel, helperText, onSubmit, onC
   const [distanceKm, setDistanceKm] = useState(
     initialValues ? String(initialValues.distanceKm) : "",
   );
-  const [date, setDate] = useState(initialValues?.date ?? today());
+  const [date, setDate] = useState(initialValues?.date ?? todayIsoDate());
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -104,7 +105,7 @@ export function TripForm({ initialValues, submitLabel, helperText, onSubmit, onC
             name="date"
             type="date"
             required
-            max={today()}
+            max={todayIsoDate()}
             value={date}
             onChange={(e) => setDate(e.target.value)}
             className="w-full rounded border border-border bg-background px-3 py-2 text-foreground transition-colors focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
@@ -130,23 +131,8 @@ export function TripForm({ initialValues, submitLabel, helperText, onSubmit, onC
 
       {transportType === "CAR" && (
         <div className="flex flex-col gap-1">
-          <label htmlFor="fuelType" className="text-sm font-medium text-muted-foreground">
-            Fuel Type
-          </label>
-          <select
-            id="fuelType"
-            name="fuelType"
-            required
-            value={fuelType}
-            onChange={(e) => setFuelType(e.target.value as FuelType)}
-            className="w-full rounded border border-border bg-background px-3 py-2 text-foreground transition-colors focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-          >
-            {FUEL_OPTIONS.map((option) => (
-              <option key={option} value={option}>
-                {FUEL_LABELS[option]}
-              </option>
-            ))}
-          </select>
+          <label className="text-sm font-medium text-muted-foreground">Fuel Type</label>
+          <Select value={fuelType} options={FUEL_SELECT_OPTIONS} onChange={setFuelType} />
         </div>
       )}
 

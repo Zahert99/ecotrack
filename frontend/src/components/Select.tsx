@@ -1,25 +1,19 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import type { TransportType } from "@/types/api";
-import { TRANSPORT_LABELS } from "./formatters";
 
-export type TransportFilterValue = TransportType | "ALL";
-
-interface TransportFilterSelectProps {
-  value: TransportFilterValue;
-  onChange: (value: TransportFilterValue) => void;
+export interface SelectOption<T extends string> {
+  value: T;
+  label: string;
 }
 
-const OPTIONS: { value: TransportFilterValue; label: string }[] = [
-  { value: "ALL", label: "All Modes" },
-  { value: "CAR", label: TRANSPORT_LABELS.CAR },
-  { value: "BUS", label: TRANSPORT_LABELS.BUS },
-  { value: "TRAIN", label: TRANSPORT_LABELS.TRAIN },
-  { value: "FLIGHT", label: TRANSPORT_LABELS.FLIGHT },
-];
+interface SelectProps<T extends string> {
+  value: T;
+  options: SelectOption<T>[];
+  onChange: (value: T) => void;
+}
 
-export function TransportFilterSelect({ value, onChange }: TransportFilterSelectProps) {
+export function Select<T extends string>({ value, options, onChange }: SelectProps<T>) {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -43,7 +37,7 @@ export function TransportFilterSelect({ value, onChange }: TransportFilterSelect
     };
   }, [isOpen]);
 
-  const activeLabel = OPTIONS.find((option) => option.value === value)?.label ?? "All Modes";
+  const activeLabel = options.find((option) => option.value === value)?.label ?? "";
 
   return (
     <div className="relative" ref={containerRef}>
@@ -64,7 +58,7 @@ export function TransportFilterSelect({ value, onChange }: TransportFilterSelect
           role="listbox"
           className="absolute left-0 top-full z-30 mt-1 w-full rounded-lg border border-border bg-background py-1 shadow-lg"
         >
-          {OPTIONS.map((option) => (
+          {options.map((option) => (
             <li key={option.value}>
               <button
                 type="button"

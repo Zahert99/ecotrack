@@ -31,8 +31,19 @@ export function formatDate(date: string): string {
 
 export type DatePreset = "last30" | "thisMonth" | "thisYear";
 
-function toIsoDate(date: Date): string {
-  return date.toISOString().slice(0, 10);
+export function toIsoDate(date: Date): string {
+  // Format using the LOCAL calendar date, not toISOString()'s UTC
+  // conversion — that would roll dates back by one in any timezone ahead
+  // of UTC (e.g. local midnight on the 1st becomes the last day of the
+  // previous month in UTC).
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+export function todayIsoDate(): string {
+  return toIsoDate(new Date());
 }
 
 export function computePresetRange(preset: DatePreset): { from: string; to: string } {
