@@ -16,7 +16,9 @@ export interface PublicUser {
 
 export interface Trip {
   id: string;
-  userId: string;
+  userId: string | null;
+  deletedUserId: string | null;
+  deletedUserName: string | null;
   companyId: string;
   transportType: TransportType;
   fuelType: FuelType | null;

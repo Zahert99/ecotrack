@@ -28,6 +28,7 @@ interface ConfirmationModalProps {
   cancelLabel?: string;
   tone?: "destructive" | "default";
   isConfirming?: boolean;
+  error?: string | null;
   onConfirm: () => void;
   onCancel: () => void;
 }
@@ -39,6 +40,7 @@ export function ConfirmationModal({
   cancelLabel = "Cancel",
   tone = "default",
   isConfirming = false,
+  error,
   onConfirm,
   onCancel,
 }: ConfirmationModalProps) {
@@ -86,6 +88,15 @@ export function ConfirmationModal({
             </p>
           </div>
         </div>
+        {error && (
+          <div
+            role="alert"
+            className="mt-4 flex items-start gap-2 rounded border border-destructive-muted bg-destructive-muted/50 p-2 text-sm text-destructive-muted-foreground"
+          >
+            <span aria-hidden="true">⚠</span>
+            <span>{error}</span>
+          </div>
+        )}
         <div className="mt-6 flex justify-end gap-3">
           <button
             ref={cancelButtonRef}

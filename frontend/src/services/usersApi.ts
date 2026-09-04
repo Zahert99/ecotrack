@@ -26,3 +26,7 @@ export function updateUserPermissions(
     data: { canViewCompanyData },
   });
 }
+
+export function deleteUser(userId: string): Promise<void> {
+  return apiRequest<void>(`/api/users/${userId}`, { method: "DELETE" });
+}
