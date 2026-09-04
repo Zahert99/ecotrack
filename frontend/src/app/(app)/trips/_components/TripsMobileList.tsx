@@ -1,5 +1,5 @@
-import type { Trip } from "@/types/api";
-import { formatCo2e, formatDate, FUEL_LABELS, TRANSPORT_LABELS } from "./formatters";
+import type { PublicUser, Trip } from "@/types/api";
+import { formatCo2e, formatDate, FUEL_LABELS, resolveTripOwnerLabel, TRANSPORT_LABELS } from "./formatters";
 import { BusIcon, CarIcon, FlightIcon, TrainIcon } from "./icons";
 import { TripRowActions } from "./TripRowActions";
 
@@ -10,6 +10,7 @@ interface TripsMobileListProps {
   onDelete: (trip: Trip) => void;
   onProposeEdit: (trip: Trip) => void;
   deletingTripId: string | null;
+  users?: PublicUser[];
 }
 
 export function TripsMobileList({
@@ -17,6 +18,7 @@ export function TripsMobileList({
   onDelete,
   onProposeEdit,
   deletingTripId,
+  users,
 }: TripsMobileListProps) {
   return (
     <div className="flex flex-col gap-3 md:hidden">
@@ -42,6 +44,11 @@ export function TripsMobileList({
                       </span>
                     )}
                   </div>
+                  {users && (
+                    <span className="mt-0.5 block text-xs text-muted-foreground">
+                      Logged by {resolveTripOwnerLabel(users, trip)}
+                    </span>
+                  )}
                 </div>
               </div>
               <TripRowActions

@@ -1,4 +1,4 @@
-import type { FuelType, TransportType } from "@/types/api";
+import type { FuelType, PublicUser, Trip, TransportType } from "@/types/api";
 
 export function formatCo2e(kg: number): { value: string; unit: string } {
   if (kg >= 1000) {
@@ -20,6 +20,14 @@ export const FUEL_LABELS: Record<FuelType, string> = {
   HYBRID: "Hybrid",
   ELECTRIC: "Electric",
 };
+
+export function resolveTripOwnerLabel(users: PublicUser[] | undefined, trip: Trip): string {
+  if (trip.userId) {
+    const owner = users?.find((u) => u.id === trip.userId);
+    if (owner) return `${owner.firstName} ${owner.lastName}`;
+  }
+  return trip.deletedUserName ?? "Former user";
+}
 
 export function formatDate(date: string): string {
   return new Date(`${date}T00:00:00`).toLocaleDateString("en-US", {

@@ -2,7 +2,10 @@
 
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { updateUserPermissions } from "@/services/usersApi";
+import { ConfirmationModal } from "@/components/ConfirmationModal";
+import { useAuth } from "@/context/AuthContext";
+import { ApiError } from "@/services/api";
+import { deleteUser, updateUserPermissions } from "@/services/usersApi";
 import type { PublicUser } from "@/types/api";
 import { InviteUserModal } from "./InviteUserModal";
 
@@ -48,8 +51,44 @@ function PermissionAction({ user }: { user: PublicUser }) {
   );
 }
 
+function RemoveButton({ user, onRequestRemove }: { user: PublicUser; onRequestRemove: (user: PublicUser) => void }) {
+  const { user: currentUser } = useAuth();
+  if (currentUser?.id === user.id) return null;
+
+  return (
+    <button
+      type="button"
+      onClick={() => onRequestRemove(user)}
+      className="rounded-full border border-border px-3 py-1 text-xs font-medium text-destructive hover:bg-destructive-muted"
+    >
+      Remove
+    </button>
+  );
+}
+
 export function TeamSection({ users }: { users: PublicUser[] | undefined }) {
   const [isInviteOpen, setIsInviteOpen] = useState(false);
+  const [userPendingRemoval, setUserPendingRemoval] = useState<PublicUser | null>(null);
+  const queryClient = useQueryClient();
+
+  const removeMutation = useMutation({
+    mutationFn: (userId: string) => deleteUser(userId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["users"] });
+      setUserPendingRemoval(null);
+    },
+  });
+
+  function requestRemoval(user: PublicUser) {
+    removeMutation.reset();
+    setUserPendingRemoval(user);
+  }
+
+  const removeErrorMessage = removeMutation.isError
+    ? removeMutation.error instanceof ApiError
+      ? removeMutation.error.message
+      : "Something went wrong. Please try again."
+    : null;
 
   return (
     <div className="rounded-xl border border-border bg-background p-6">
@@ -88,6 +127,7 @@ export function TeamSection({ users }: { users: PublicUser[] | undefined }) {
                     <th className="whitespace-nowrap px-4 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                       Company Data
                     </th>
+                    <th className="px-4 py-3"></th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
@@ -102,6 +142,9 @@ export function TeamSection({ users }: { users: PublicUser[] | undefined }) {
                       </td>
                       <td className="whitespace-nowrap px-4 py-3">
                         <PermissionAction user={user} />
+                      </td>
+                      <td className="whitespace-nowrap px-4 py-3 text-right">
+                        <RemoveButton user={user} onRequestRemove={requestRemoval} />
                       </td>
                     </tr>
                   ))}
@@ -124,7 +167,10 @@ export function TeamSection({ users }: { users: PublicUser[] | undefined }) {
                     <RoleBadge role={user.role} />
                   </div>
                 </div>
-                <PermissionAction user={user} />
+                <div className="flex items-center justify-between gap-2">
+                  <PermissionAction user={user} />
+                  <RemoveButton user={user} onRequestRemove={requestRemoval} />
+                </div>
               </div>
             ))}
           </div>
@@ -132,6 +178,19 @@ export function TeamSection({ users }: { users: PublicUser[] | undefined }) {
       )}
 
       {isInviteOpen && <InviteUserModal onClose={() => setIsInviteOpen(false)} />}
+
+      {userPendingRemoval && (
+        <ConfirmationModal
+          title="Remove User"
+          description={`Remove ${userPendingRemoval.firstName} ${userPendingRemoval.lastName}? Their trips stay on record but will no longer be attributed to an active account. This can't be undone.`}
+          confirmLabel="Remove"
+          tone="destructive"
+          isConfirming={removeMutation.isPending}
+          error={removeErrorMessage}
+          onConfirm={() => removeMutation.mutate(userPendingRemoval.id)}
+          onCancel={() => setUserPendingRemoval(null)}
+        />
+      )}
     </div>
   );
 }

@@ -4,7 +4,10 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ConfirmationModal } from "@/components/ConfirmationModal";
+import { useAuth } from "@/context/AuthContext";
+import { ApiError } from "@/services/api";
 import { deleteTrip, listTrips } from "@/services/tripsApi";
+import { listUsers } from "@/services/usersApi";
 import type { Trip } from "@/types/api";
 import { FilterBar, type TripFilters } from "./_components/FilterBar";
 import { ProposeEditModal } from "./_components/ProposeEditModal";
@@ -12,8 +15,15 @@ import { TripsMobileList } from "./_components/TripsMobileList";
 import { TripsTable } from "./_components/TripsTable";
 
 export default function TripsPage() {
+  const { user } = useAuth();
   const queryClient = useQueryClient();
   const tripsQuery = useQuery({ queryKey: ["trips"], queryFn: listTrips });
+  const canSeeCompanyData = user?.role === "ADMIN" || !!user?.canViewCompanyData;
+  const usersQuery = useQuery({
+    queryKey: ["users"],
+    queryFn: listUsers,
+    enabled: canSeeCompanyData,
+  });
 
   const [filters, setFilters] = useState<TripFilters>({ transportType: "ALL", from: "", to: "" });
   const [proposeEditTrip, setProposeEditTrip] = useState<Trip | null>(null);
@@ -44,8 +54,15 @@ export default function TripsPage() {
   }, [trips, filters]);
 
   function handleDelete(trip: Trip) {
+    deleteMutation.reset();
     setTripPendingDelete(trip);
   }
+
+  const deleteErrorMessage = deleteMutation.isError
+    ? deleteMutation.error instanceof ApiError
+      ? deleteMutation.error.message
+      : "Something went wrong. Please try again."
+    : null;
 
   return (
     <div className="space-y-6 p-6 md:p-8">
@@ -78,12 +95,14 @@ export default function TripsPage() {
             onDelete={handleDelete}
             onProposeEdit={setProposeEditTrip}
             deletingTripId={deletingTripId}
+            users={canSeeCompanyData ? usersQuery.data : undefined}
           />
           <TripsMobileList
             trips={filteredTrips}
             onDelete={handleDelete}
             onProposeEdit={setProposeEditTrip}
             deletingTripId={deletingTripId}
+            users={canSeeCompanyData ? usersQuery.data : undefined}
           />
         </>
       )}
@@ -99,6 +118,7 @@ export default function TripsPage() {
           confirmLabel="Delete"
           tone="destructive"
           isConfirming={deleteMutation.isPending}
+          error={deleteErrorMessage}
           onConfirm={() => deleteMutation.mutate(tripPendingDelete.id)}
           onCancel={() => setTripPendingDelete(null)}
         />

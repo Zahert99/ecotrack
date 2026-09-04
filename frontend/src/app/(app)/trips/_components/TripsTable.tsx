@@ -1,5 +1,5 @@
-import type { Trip } from "@/types/api";
-import { formatCo2e, formatDate, FUEL_LABELS, TRANSPORT_LABELS } from "./formatters";
+import type { PublicUser, Trip } from "@/types/api";
+import { formatCo2e, formatDate, FUEL_LABELS, resolveTripOwnerLabel, TRANSPORT_LABELS } from "./formatters";
 import { BusIcon, CarIcon, FlightIcon, TrainIcon } from "./icons";
 import { TripRowActions } from "./TripRowActions";
 
@@ -10,9 +10,10 @@ interface TripsTableProps {
   onDelete: (trip: Trip) => void;
   onProposeEdit: (trip: Trip) => void;
   deletingTripId: string | null;
+  users?: PublicUser[];
 }
 
-export function TripsTable({ trips, onDelete, onProposeEdit, deletingTripId }: TripsTableProps) {
+export function TripsTable({ trips, onDelete, onProposeEdit, deletingTripId, users }: TripsTableProps) {
   return (
     <div className="hidden overflow-hidden rounded-xl border border-border bg-background md:block">
       <div className="overflow-x-auto">
@@ -22,6 +23,11 @@ export function TripsTable({ trips, onDelete, onProposeEdit, deletingTripId }: T
               <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                 Date
               </th>
+              {users && (
+                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  Logged By
+                </th>
+              )}
               <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                 Transport
               </th>
@@ -44,6 +50,11 @@ export function TripsTable({ trips, onDelete, onProposeEdit, deletingTripId }: T
               return (
                 <tr key={trip.id} className="hover:bg-muted/50">
                   <td className="px-4 py-3 text-sm text-foreground">{formatDate(trip.date)}</td>
+                  {users && (
+                    <td className="px-4 py-3 text-sm text-muted-foreground">
+                      {resolveTripOwnerLabel(users, trip)}
+                    </td>
+                  )}
                   <td className="px-4 py-3">
                     <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-muted px-2.5 py-1 text-xs font-medium text-foreground">
                       <TransportIcon className="h-3.5 w-3.5" />
