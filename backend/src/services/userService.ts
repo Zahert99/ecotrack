@@ -2,9 +2,14 @@ import bcrypt from 'bcrypt';
 import { DatabaseError } from 'pg';
 import { BCRYPT_COST } from '../config/passwordConfig';
 import { pool } from '../database/pool';
+import { withTransaction } from '../database/withTransaction';
 import { UNIQUE_VIOLATION } from '../database/pgErrorCodes';
 import { HttpError } from '../middleware/errorHandler';
+import { snapshotDeletedOwner } from '../repositories/tripRepository';
 import {
+  countAdminsForCompany,
+  deleteUser as deleteUserRow,
+  findUserById,
   insertUser,
   listUsersForCompany,
   PublicUser,
@@ -57,4 +62,31 @@ export async function updatePermissions(
     throw new HttpError(404, 'USER_NOT_FOUND', 'User not found');
   }
   return toPublicUser(updated);
+}
+
+export async function deleteUser(
+  companyId: string,
+  requesterId: string,
+  targetUserId: string,
+): Promise<void> {
+  if (requesterId === targetUserId) {
+    throw new HttpError(400, 'CANNOT_DELETE_SELF', 'You cannot remove your own account');
+  }
+
+  await withTransaction(async (client) => {
+    const target = await findUserById(client, companyId, targetUserId);
+    if (!target) {
+      throw new HttpError(404, 'USER_NOT_FOUND', 'User not found');
+    }
+
+    if (target.role === 'ADMIN') {
+      const adminCount = await countAdminsForCompany(client, companyId);
+      if (adminCount <= 1) {
+        throw new HttpError(409, 'LAST_ADMIN', 'Cannot remove the only remaining admin');
+      }
+    }
+
+    await snapshotDeletedOwner(client, companyId, targetUserId);
+    await deleteUserRow(client, companyId, targetUserId);
+  });
 }

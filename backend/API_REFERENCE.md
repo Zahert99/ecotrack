@@ -38,6 +38,7 @@ Two independent gates run per route, in order:
 | `POST /api/users`                           | ADMIN           | invite a teammate                                                    |
 | `GET /api/users`                            | ADMIN           | list company users                                                   |
 | `PATCH /api/users/:id/permissions`          | ADMIN           | direct grant/revoke of `canViewCompanyData`                          |
+| `DELETE /api/users/:id`                     | ADMIN           | removes a user; their trips are preserved, not deleted               |
 | `POST /api/permission-requests`             | USER            | self-request `canViewCompanyData` or `ADMIN_ROLE`                    |
 | `GET /api/permission-requests/my-status`    | USER            | caller's latest request of each type                                 |
 | `GET /api/permission-requests`              | ADMIN           | pending requests only (both types)                                   |
@@ -100,7 +101,9 @@ type FuelType = 'PETROL' | 'DIESEL' | 'HYBRID' | 'ELECTRIC';
 
 interface Trip {
   id: string;
-  userId: string;
+  userId: string | null; // null if the owning user was since removed (DELETE /api/users/:id) — see deletedUserId/deletedUserName
+  deletedUserId: string | null; // permanent snapshot of the removed user's id, NOT a live FK — that row no longer exists
+  deletedUserName: string | null; // permanent snapshot of the removed user's name, for display once userId is null
   companyId: string;
   transportType: TransportType;
   fuelType: FuelType | null;
@@ -112,6 +115,15 @@ interface Trip {
   updatedAt: string;
 }
 ```
+
+Removing a user (`DELETE /api/users/:id`) does **not** delete their trips —
+`user_id` is nullable with `ON DELETE SET NULL`, and `deletedUserId`/
+`deletedUserName` are snapshotted onto every affected trip in the same
+transaction, before the user row is removed. This keeps company-wide
+analytics (`GET /api/analytics/*`) historically accurate: those queries
+already treat a `NULL` `user_id` as "still counts for company-wide scope,
+never matches a specific user's own scope," so removed users' trips
+continue contributing to aggregate totals exactly as before.
 
 #### `POST /api/trips`
 
@@ -279,6 +291,15 @@ Errors: `409 EMAIL_TAKEN`
 ```
 
 Errors: `404 USER_NOT_FOUND` (also returned if `:id` belongs to another company — no cross-tenant leak)
+
+#### `DELETE /api/users/:id`
+
+`204` (no body) on success. The user's trips are **not** deleted — see the
+`Trip` interface above.
+
+Errors: `400 CANNOT_DELETE_SELF`, `404 USER_NOT_FOUND` (also returned for a
+cross-tenant `:id`), `409 LAST_ADMIN` (`:id` is the company's only remaining
+`ADMIN`)
 
 ---
 

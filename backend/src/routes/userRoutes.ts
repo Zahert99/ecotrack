@@ -3,6 +3,7 @@ import {
   create,
   createUserSchema,
   list,
+  remove,
   updatePermissions,
   updatePermissionsSchema,
 } from '../controllers/userController';
@@ -17,5 +18,6 @@ router.use(requireRole('ADMIN'));
 router.post('/', validateBody(createUserSchema), create);
 router.get('/', list);
 router.patch('/:id/permissions', validateBody(updatePermissionsSchema), updatePermissions);
+router.delete('/:id', remove);
 
 export default router;

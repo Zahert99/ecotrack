@@ -64,3 +64,13 @@ export async function updatePermissions(
     next(err);
   }
 }
+
+export async function remove(req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    const auth = requireAuthContext(req);
+    await userService.deleteUser(auth.companyId, auth.userId, requireUserId(req));
+    res.status(204).send();
+  } catch (err) {
+    next(err);
+  }
+}

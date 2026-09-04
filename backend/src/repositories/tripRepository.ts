@@ -5,7 +5,9 @@ export type FuelType = 'PETROL' | 'DIESEL' | 'HYBRID' | 'ELECTRIC';
 
 export interface Trip {
   id: string;
-  userId: string;
+  userId: string | null;
+  deletedUserId: string | null;
+  deletedUserName: string | null;
   companyId: string;
   transportType: TransportType;
   fuelType: FuelType | null;
@@ -19,7 +21,9 @@ export interface Trip {
 
 interface TripRow {
   id: string;
-  user_id: string;
+  user_id: string | null;
+  deleted_user_id: string | null;
+  deleted_user_name: string | null;
   company_id: string;
   transport_type: TransportType;
   fuel_type: FuelType | null;
@@ -35,6 +39,8 @@ function toTrip(row: TripRow): Trip {
   return {
     id: row.id,
     userId: row.user_id,
+    deletedUserId: row.deleted_user_id,
+    deletedUserName: row.deleted_user_name,
     companyId: row.company_id,
     transportType: row.transport_type,
     fuelType: row.fuel_type,
@@ -47,7 +53,7 @@ function toTrip(row: TripRow): Trip {
   };
 }
 
-const SELECT_COLUMNS = `id, user_id, company_id, transport_type, fuel_type, distance_km,
+const SELECT_COLUMNS = `id, user_id, deleted_user_id, deleted_user_name, company_id, transport_type, fuel_type, distance_km,
   passenger_count, co2e_kg, date, created_at, updated_at`;
 
 export async function insertTrip(
@@ -177,4 +183,21 @@ export async function deleteTrip(
     tripId,
   ]);
   return (result.rowCount ?? 0) > 0;
+}
+
+// Must run before the referenced users row is deleted, in the same
+// transaction — the name subquery needs the user to still exist. The FK's
+// ON DELETE SET NULL then nulls user_id automatically once they're gone.
+export async function snapshotDeletedOwner(
+  client: Pool | PoolClient,
+  companyId: string,
+  userId: string,
+): Promise<void> {
+  await client.query(
+    `UPDATE trips
+     SET deleted_user_id = $2,
+         deleted_user_name = (SELECT first_name || ' ' || last_name FROM users WHERE id = $2)
+     WHERE company_id = $1 AND user_id = $2`,
+    [companyId, userId],
+  );
 }

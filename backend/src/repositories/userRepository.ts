@@ -171,3 +171,26 @@ export async function updateUserRole(
   );
   return result.rows[0] ? toUser(result.rows[0]) : null;
 }
+
+export async function deleteUser(
+  client: Pool | PoolClient,
+  companyId: string,
+  userId: string,
+): Promise<boolean> {
+  const result = await client.query('DELETE FROM users WHERE company_id = $1 AND id = $2', [
+    companyId,
+    userId,
+  ]);
+  return (result.rowCount ?? 0) > 0;
+}
+
+export async function countAdminsForCompany(
+  client: Pool | PoolClient,
+  companyId: string,
+): Promise<number> {
+  const result = await client.query<{ count: string }>(
+    `SELECT COUNT(*) FROM users WHERE company_id = $1 AND role = 'ADMIN'`,
+    [companyId],
+  );
+  return Number(result.rows[0].count);
+}
