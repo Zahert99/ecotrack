@@ -40,7 +40,7 @@ export default function LoginPage() {
 
   return (
     <div className='min-h-full flex items-center justify-center bg-background p-4'>
-      <div className='w-full max-w-[400px] flex flex-col items-center'>
+      <div className='w-full max-w-100 flex flex-col items-center'>
         <div className='mb-6 flex items-center gap-2'>
           <svg
             viewBox='0 0 24 24'

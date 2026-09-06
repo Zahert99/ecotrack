@@ -17,10 +17,16 @@ ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend);
 
 function readCssVar(name: string): string {
   if (typeof window === "undefined") return "#000000";
-  return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  return getComputedStyle(document.documentElement)
+    .getPropertyValue(name)
+    .trim();
 }
 
-export function QuarterlyComparisonChart({ comparison }: { comparison: QuarterlyComparison[] }) {
+export function QuarterlyComparisonChart({
+  comparison,
+}: {
+  comparison: QuarterlyComparison[];
+}) {
   const { data, options } = useMemo(() => {
     const primary = readCssVar("--primary");
     const mutedForeground = readCssVar("--muted-foreground");
@@ -50,7 +56,10 @@ export function QuarterlyComparisonChart({ comparison }: { comparison: Quarterly
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
-          legend: { position: "top" as const, labels: { color: mutedForeground, boxWidth: 12 } },
+          legend: {
+            position: "top" as const,
+            labels: { color: mutedForeground, boxWidth: 12 },
+          },
           tooltip: {
             callbacks: {
               label: (ctx: TooltipItem<"bar">) =>
@@ -60,14 +69,18 @@ export function QuarterlyComparisonChart({ comparison }: { comparison: Quarterly
         },
         scales: {
           x: { grid: { display: false }, ticks: { color: mutedForeground } },
-          y: { beginAtZero: true, grid: { color: border }, ticks: { color: mutedForeground } },
+          y: {
+            beginAtZero: true,
+            grid: { color: border },
+            ticks: { color: mutedForeground },
+          },
         },
       },
     };
   }, [comparison]);
 
   return (
-    <div className="h-64 w-full min-w-80">
+    <div className='h-64 w-full min-w-80'>
       <Bar data={data} options={options} />
     </div>
   );
