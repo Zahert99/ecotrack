@@ -2,6 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { getSummary, getTrends } from "@/services/analyticsApi";
+import { getCompanySummary } from "@/services/companyApi";
 import { EmissionsTrendChart } from "@/components/EmissionsTrendChart";
 import { KpiCard } from "./_components/KpiCard";
 import { computeDelta, formatCo2e } from "./_components/formatters";
@@ -13,6 +14,7 @@ function SkeletonCard() {
 export default function DashboardPage() {
   const summaryQuery = useQuery({ queryKey: ["analytics", "summary"], queryFn: getSummary });
   const trendsQuery = useQuery({ queryKey: ["analytics", "trends"], queryFn: getTrends });
+  const companyQuery = useQuery({ queryKey: ["company"], queryFn: getCompanySummary });
 
   const trends = trendsQuery.data;
   const current = trends && trends.length >= 2 ? trends.at(-1) : undefined;
@@ -25,31 +27,49 @@ export default function DashboardPage() {
     <div className="p-6 md:p-8 space-y-8">
       <h2 className="text-2xl font-semibold text-foreground">Dashboard</h2>
 
-      {summaryQuery.isError ? (
-        <p className="text-sm text-destructive">Couldn&apos;t load this month&apos;s summary.</p>
-      ) : !summaryQuery.data ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        {summaryQuery.isError ? (
+          <p className="text-sm text-destructive sm:col-span-2">
+            Couldn&apos;t load this month&apos;s summary.
+          </p>
+        ) : !summaryQuery.data ? (
+          <>
+            <SkeletonCard />
+            <SkeletonCard />
+          </>
+        ) : (
+          <>
+            <KpiCard
+              label="Total CO2e (This Month)"
+              value={formatCo2e(summaryQuery.data.totalCo2eKg).value}
+              unit={formatCo2e(summaryQuery.data.totalCo2eKg).unit}
+              delta={co2eDelta}
+              deltaTone="emissions"
+            />
+            <KpiCard
+              label="Trips Logged (This Month)"
+              value={String(summaryQuery.data.tripCount)}
+              unit="trips"
+              delta={tripCountDelta}
+              deltaTone="neutral"
+            />
+          </>
+        )}
+
+        {companyQuery.isError ? (
+          <p className="text-sm text-destructive">Couldn&apos;t load company info.</p>
+        ) : !companyQuery.data ? (
           <SkeletonCard />
-          <SkeletonCard />
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        ) : (
           <KpiCard
-            label="Total CO2e (This Month)"
-            value={formatCo2e(summaryQuery.data.totalCo2eKg).value}
-            unit={formatCo2e(summaryQuery.data.totalCo2eKg).unit}
-            delta={co2eDelta}
-            deltaTone="emissions"
+            label="Organization"
+            value={companyQuery.data.name}
+            unit={`${companyQuery.data.employeeCount.toLocaleString()} ${
+              companyQuery.data.employeeCount === 1 ? "employee" : "employees"
+            }`}
           />
-          <KpiCard
-            label="Trips Logged (This Month)"
-            value={String(summaryQuery.data.tripCount)}
-            unit="trips"
-            delta={tripCountDelta}
-            deltaTone="neutral"
-          />
-        </div>
-      )}
+        )}
+      </div>
 
       <div className="rounded-xl border border-border bg-background p-6">
         <h3 className="text-lg font-semibold text-foreground">Monthly Emissions Trend</h3>
