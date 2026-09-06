@@ -35,6 +35,7 @@ Two independent gates run per route, in order:
 | `GET /api/trip-edit-requests`               | ADMIN           | pending edit proposals company-wide                                  |
 | `PATCH /api/trip-edit-requests/:id`         | ADMIN           | approve (applies the edit) / reject                                  |
 | `GET /api/analytics/*`                      | ADMIN, USER     | USER sees own data only, unless `canViewCompanyData`                 |
+| `GET /api/company`                          | ADMIN, USER     | own company's name + employee count, any authenticated role          |
 | `POST /api/users`                           | ADMIN           | invite a teammate                                                    |
 | `GET /api/users`                            | ADMIN           | list company users                                                   |
 | `PATCH /api/users/:id/permissions`          | ADMIN           | direct grant/revoke of `canViewCompanyData`                          |
@@ -216,7 +217,7 @@ Errors: `404 EDIT_REQUEST_NOT_FOUND`, `409 EDIT_REQUEST_ALREADY_RESOLVED`
 
 ### `/api/analytics`
 
-All three routes take no params/body and scope automatically to the caller (own data, or company-wide for ADMIN/`canViewCompanyData`).
+All routes take no params/body and scope automatically to the caller (own data, or company-wide for ADMIN/`canViewCompanyData`).
 
 ```ts
 interface MonthlySummary {
@@ -227,17 +228,44 @@ interface TransportBreakdown {
   transportType: TransportType;
   co2eKg: number;
   tripCount: number;
+  distanceKm: number; // added for per-km/per-passenger efficiency charts
+  passengerCount: number;
+}
+interface FuelBreakdown {
+  fuelType: FuelType;
+  co2eKg: number;
+  tripCount: number;
 }
 interface MonthlyTrend {
   month: string;
   co2eKg: number;
   tripCount: number;
 }
+interface QuarterlyComparison {
+  quarter: string; // 'Q1' | 'Q2' | 'Q3' | 'Q4'
+  currentYearCo2eKg: number;
+  previousYearCo2eKg: number;
+}
 ```
 
-- `GET /api/analytics/summary` → `200 { data: MonthlySummary }`
-- `GET /api/analytics/by-transport` → `200 { data: TransportBreakdown[] }`
-- `GET /api/analytics/trends` → `200 { data: MonthlyTrend[] }`
+- `GET /api/analytics/summary` → `200 { data: MonthlySummary }` — this calendar month.
+- `GET /api/analytics/by-transport` → `200 { data: TransportBreakdown[] }` — this calendar month, one row per transport type actually used (sparse).
+- `GET /api/analytics/by-fuel-type` → `200 { data: FuelBreakdown[] }` — this calendar month, CAR trips only, one row per fuel type actually used (sparse).
+- `GET /api/analytics/trends` → `200 { data: MonthlyTrend[] }` — year-to-date, zero-filled per month.
+- `GET /api/analytics/quarterly-comparison` → `200 { data: QuarterlyComparison[] }` — always 4 rows (Q1–Q4); `previousYearCo2eKg` compares against the same quarter last year, zero-filled if no trips exist for that quarter/year.
+
+---
+
+### `/api/company`
+
+```ts
+interface CompanySummary {
+  name: string;
+  employeeCount: number; // COUNT(*) over users for the caller's company — not a stored field
+}
+```
+
+- `GET /api/company` → `200 { data: CompanySummary }` — any authenticated role (`requireAuth` only, no role restriction).
 
 ---
 
