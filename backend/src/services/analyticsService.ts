@@ -1,10 +1,14 @@
 import { pool } from '../database/pool';
 import {
+  FuelBreakdown,
+  getBreakdownByFuelType,
   getBreakdownByTransport,
   getMonthlySummary,
   getMonthlyTrends,
+  getQuarterlyComparison,
   MonthlySummary,
   MonthlyTrend,
+  QuarterlyComparison,
   TransportBreakdown,
 } from '../repositories/analyticsRepository';
 import { UserRole } from '../repositories/userRepository';
@@ -27,6 +31,20 @@ export async function getByTransport(
   return getBreakdownByTransport(pool, companyId, resolveCompanyScope(requester));
 }
 
+export async function getByFuelType(
+  companyId: string,
+  requester: Requester,
+): Promise<FuelBreakdown[]> {
+  return getBreakdownByFuelType(pool, companyId, resolveCompanyScope(requester));
+}
+
 export async function getTrends(companyId: string, requester: Requester): Promise<MonthlyTrend[]> {
   return getMonthlyTrends(pool, companyId, resolveCompanyScope(requester));
+}
+
+export async function getQuarterlyYoyComparison(
+  companyId: string,
+  requester: Requester,
+): Promise<QuarterlyComparison[]> {
+  return getQuarterlyComparison(pool, companyId, resolveCompanyScope(requester));
 }

@@ -31,3 +31,27 @@ export async function trends(req: Request, res: Response, next: NextFunction): P
     next(err);
   }
 }
+
+export async function byFuelType(req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    const auth = requireAuthContext(req);
+    const data = await analyticsService.getByFuelType(auth.companyId, auth);
+    res.status(200).json({ data });
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function quarterlyComparison(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
+  try {
+    const auth = requireAuthContext(req);
+    const data = await analyticsService.getQuarterlyYoyComparison(auth.companyId, auth);
+    res.status(200).json({ data });
+  } catch (err) {
+    next(err);
+  }
+}
