@@ -23,3 +23,23 @@ export async function insertCompany(client: Pool | PoolClient, name: string): Pr
   );
   return toCompany(result.rows[0]);
 }
+
+export interface CompanySummary {
+  name: string;
+  employeeCount: number;
+}
+
+export async function getCompanySummary(
+  client: Pool | PoolClient,
+  companyId: string,
+): Promise<CompanySummary | null> {
+  const result = await client.query<{ name: string; employee_count: string }>(
+    `SELECT c.name, (SELECT COUNT(*) FROM users u WHERE u.company_id = c.id) AS employee_count
+     FROM companies c
+     WHERE c.id = $1`,
+    [companyId],
+  );
+  const row = result.rows[0];
+  if (!row) return null;
+  return { name: row.name, employeeCount: Number(row.employee_count) };
+}
