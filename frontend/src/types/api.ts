@@ -47,12 +47,31 @@ export interface TransportBreakdown {
   transportType: TransportType;
   co2eKg: number;
   tripCount: number;
+  distanceKm: number;
+  passengerCount: number;
+}
+
+export interface FuelBreakdown {
+  fuelType: FuelType;
+  co2eKg: number;
+  tripCount: number;
 }
 
 export interface MonthlyTrend {
   month: string;
   co2eKg: number;
   tripCount: number;
+}
+
+export interface QuarterlyComparison {
+  quarter: string;
+  currentYearCo2eKg: number;
+  previousYearCo2eKg: number;
+}
+
+export interface CompanySummary {
+  name: string;
+  employeeCount: number;
 }
 
 export interface PermissionRequest {
