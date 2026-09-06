@@ -1,0 +1,100 @@
+"use client";
+
+import { useMemo, useState } from "react";
+import {
+  BarElement,
+  CategoryScale,
+  Chart as ChartJS,
+  LinearScale,
+  Tooltip,
+  type TooltipItem,
+} from "chart.js";
+import { Bar } from "react-chartjs-2";
+import type { TransportBreakdown } from "@/types/api";
+import { TRANSPORT_LABELS } from "./formatters";
+
+ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip);
+
+function readCssVar(name: string): string {
+  if (typeof window === "undefined") return "#000000";
+  return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+}
+
+type EfficiencyMetric = "perKm" | "perPassenger";
+
+export function EfficiencyByModeChart({ breakdown }: { breakdown: TransportBreakdown[] }) {
+  const [metric, setMetric] = useState<EfficiencyMetric>("perKm");
+
+  const { data, options } = useMemo(() => {
+    const values = breakdown.map((entry) =>
+      metric === "perKm" ? entry.co2eKg / entry.distanceKm : entry.co2eKg / entry.passengerCount,
+    );
+    const barColor = readCssVar(metric === "perKm" ? "--primary" : "--secondary");
+    const mutedForeground = readCssVar("--muted-foreground");
+    const border = readCssVar("--border");
+    const unit = metric === "perKm" ? "kg/km" : "kg/passenger";
+
+    return {
+      data: {
+        labels: breakdown.map((entry) => TRANSPORT_LABELS[entry.transportType]),
+        datasets: [
+          {
+            label: unit,
+            data: values,
+            backgroundColor: barColor,
+            borderRadius: 4,
+            maxBarThickness: 40,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: (ctx: TooltipItem<"bar">) => `${(ctx.parsed.y ?? 0).toFixed(2)} ${unit}`,
+            },
+          },
+        },
+        scales: {
+          x: { grid: { display: false }, ticks: { color: mutedForeground } },
+          y: { beginAtZero: true, grid: { color: border }, ticks: { color: mutedForeground } },
+        },
+      },
+    };
+  }, [breakdown, metric]);
+
+  return (
+    <div>
+      <div className="mb-4 flex justify-end gap-1 rounded-lg bg-muted p-1 text-xs font-medium">
+        <button
+          type="button"
+          onClick={() => setMetric("perKm")}
+          className={`rounded-md px-3 py-1.5 transition-colors ${
+            metric === "perKm"
+              ? "bg-background text-foreground shadow-sm"
+              : "text-muted-foreground"
+          }`}
+        >
+          Per km
+        </button>
+        <button
+          type="button"
+          onClick={() => setMetric("perPassenger")}
+          className={`rounded-md px-3 py-1.5 transition-colors ${
+            metric === "perPassenger"
+              ? "bg-background text-foreground shadow-sm"
+              : "text-muted-foreground"
+          }`}
+        >
+          Per passenger
+        </button>
+      </div>
+      <div className="h-64 w-full min-w-80">
+        <Bar data={data} options={options} />
+      </div>
+    </div>
+  );
+}

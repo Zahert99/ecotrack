@@ -1,4 +1,4 @@
-import type { TransportType } from "@/types/api";
+import type { FuelType, TransportType } from "@/types/api";
 
 export function formatCo2e(kg: number): { value: string; unit: string } {
   if (kg >= 1000) {
@@ -19,4 +19,18 @@ export const TRANSPORT_COLORS: Record<TransportType, string> = {
   BUS: "--chart-2",
   TRAIN: "--chart-3",
   FLIGHT: "--chart-4",
+};
+
+export const FUEL_LABELS: Record<FuelType, string> = {
+  PETROL: "Petrol",
+  DIESEL: "Diesel",
+  HYBRID: "Hybrid",
+  ELECTRIC: "Electric",
+};
+
+export const FUEL_COLORS: Record<FuelType, string> = {
+  PETROL: "--chart-1",
+  DIESEL: "--chart-2",
+  HYBRID: "--chart-3",
+  ELECTRIC: "--chart-4",
 };
