@@ -29,6 +29,16 @@
   --chart-2: #10b981;
   --chart-3: #38bdf8;
   --chart-4: #f59e0b;
+
+  /* Landing page (/landingpage) — deliberately its own warm palette,
+     distinct from the app shell's Forest Green theme above. */
+  --landing-bg: #fcfbf9;
+  --landing-ink: #191919;
+  --landing-muted: #6b7280;
+  --landing-accent: #059669;
+  --landing-accent-foreground: #ffffff;
+  --landing-border: #e5e5e5;
+  --landing-surface: #ffffff;
 }
 
 @theme inline {
@@ -54,6 +64,14 @@
   --color-chart-2: var(--chart-2);
   --color-chart-3: var(--chart-3);
   --color-chart-4: var(--chart-4);
+
+  --color-landing-bg: var(--landing-bg);
+  --color-landing-ink: var(--landing-ink);
+  --color-landing-muted: var(--landing-muted);
+  --color-landing-accent: var(--landing-accent);
+  --color-landing-accent-foreground: var(--landing-accent-foreground);
+  --color-landing-border: var(--landing-border);
+  --color-landing-surface: var(--landing-surface);
 
   --font-sans: var(--font-inter);
   --font-mono: var(--font-geist-mono);
