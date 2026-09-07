@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useState, type SubmitEvent } from "react";
 import { Select } from "@/components/Select";
 import { ApiError } from "@/services/api";
 import type { FuelType, Trip, TransportType, TripInput } from "@/types/api";
@@ -40,7 +40,7 @@ export function TripForm({ initialValues, submitLabel, helperText, onSubmit, onC
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  async function handleSubmit(e: FormEvent) {
+  async function handleSubmit(e: SubmitEvent<HTMLFormElement>) {
     e.preventDefault();
     setError(null);
     setIsSubmitting(true);

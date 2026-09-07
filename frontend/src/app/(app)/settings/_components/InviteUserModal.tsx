@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useState, type SubmitEvent } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Select } from "@/components/Select";
 import { ApiError } from "@/services/api";
@@ -33,7 +33,7 @@ export function InviteUserModal({ onClose }: { onClose: () => void }) {
     },
   });
 
-  function handleSubmit(e: FormEvent) {
+  function handleSubmit(e: SubmitEvent<HTMLFormElement>) {
     e.preventDefault();
     setError(null);
     mutation.mutate();
