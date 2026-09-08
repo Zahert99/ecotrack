@@ -13,7 +13,8 @@
     "migrate:up": "node-pg-migrate up",
     "migrate:down": "node-pg-migrate down",
     "migrate:create": "node-pg-migrate create -j sql --",
-    "seed:demo": "tsx scripts/seedDemoData.ts"
+    "seed:demo": "tsx scripts/seedDemoData.ts",
+    "seed:testcompany2": "tsx scripts/seedTestCompany2.ts"
   },
   "keywords": [],
   "author": "",
