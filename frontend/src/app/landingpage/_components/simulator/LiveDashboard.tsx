@@ -23,6 +23,9 @@ export function LiveDashboard({ transportType, fuelType, co2eKg, reducedMotion }
           Efficiency by mode
         </p>
         <MiniEfficiencyBars activeKey={activeKey} />
+        <p className="mt-2 text-xs text-landing-muted">
+          Emission factors: Naturvårdsverket / Trafikverket
+        </p>
       </div>
       <div>
         <p className="mb-2 text-xs font-semibold tracking-wide text-landing-muted uppercase">
