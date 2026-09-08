@@ -2,6 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { isNavItemActive, NAV_ITEMS } from "./navItems";
 
 export function TopBar() {
@@ -14,11 +15,14 @@ export function TopBar() {
   return (
     <header className="hidden md:flex sticky top-0 z-30 h-16 items-center justify-between border-b border-border bg-background px-8">
       <h1 className="text-lg font-semibold text-foreground">{activeItem?.label ?? "EcoTrack"}</h1>
-      {user && (
-        <div className="flex h-9 w-9 items-center justify-center rounded-full bg-accent text-sm font-semibold text-accent-foreground">
-          {initials}
-        </div>
-      )}
+      <div className="flex items-center gap-3">
+        <ThemeToggle />
+        {user && (
+          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-accent text-sm font-semibold text-accent-foreground">
+            {initials}
+          </div>
+        )}
+      </div>
     </header>
   );
 }

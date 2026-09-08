@@ -1,6 +1,7 @@
 "use client";
 
 import { useAuth } from "@/context/AuthContext";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { LogoutIcon } from "./icons";
 
 export function MobileTopBar() {
@@ -15,14 +16,17 @@ export function MobileTopBar() {
         </div>
         <span className="text-lg font-semibold tracking-tight text-primary">EcoTrack</span>
       </div>
-      <button
-        type="button"
-        onClick={logout}
-        aria-label="Log out"
-        className="p-2 rounded-full text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
-      >
-        <LogoutIcon className="h-5 w-5" />
-      </button>
+      <div className="flex items-center gap-1">
+        <ThemeToggle />
+        <button
+          type="button"
+          onClick={logout}
+          aria-label="Log out"
+          className="p-2 rounded-full text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+        >
+          <LogoutIcon className="h-5 w-5" />
+        </button>
+      </div>
     </header>
   );
 }

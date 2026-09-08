@@ -77,3 +77,20 @@ export function LogoutIcon(props: SVGProps<SVGSVGElement>) {
     </Icon>
   );
 }
+
+export function SunIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <Icon {...props}>
+      <circle cx="12" cy="12" r="4.25" />
+      <path d="M12 2.75v2.5M12 18.75v2.5M4.22 4.22l1.77 1.77M17.99 17.99l1.77 1.77M2.75 12h2.5M18.75 12h2.5M4.22 19.78l1.77-1.77M17.99 6.01l1.77-1.77" />
+    </Icon>
+  );
+}
+
+export function MoonIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <Icon {...props}>
+      <path d="M20.25 14.5A8.25 8.25 0 1 1 9.5 3.75a6.5 6.5 0 0 0 10.75 10.75Z" />
+    </Icon>
+  );
+}

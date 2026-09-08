@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 /*
  * "EcoTrack" design system, exported from the Stitch "EcoTrack Emissions
  * Dashboard" project (Corporate Modern / Enterprise Green). Every color in
@@ -77,14 +79,18 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0f1a2b;
-    --foreground: #eaf1ff;
-    --muted: #1c2a3f;
-    --muted-foreground: #a7b2c9;
-    --border: #2b3b52;
-  }
+.dark {
+  --background: #0f1a2b;
+  --foreground: #eaf1ff;
+  --muted: #1c2a3f;
+  --muted-foreground: #a7b2c9;
+  --border: #2b3b52;
+  --accent: #123d2f;
+  --accent-foreground: #6ee7b7;
+  --destructive: #ef4444;
+  --destructive-muted: #3a1414;
+  --destructive-muted-foreground: #ffb4ab;
+  --chart-1: #34d399;
 }
 
 body {
