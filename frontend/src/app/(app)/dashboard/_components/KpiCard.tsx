@@ -7,6 +7,7 @@ interface KpiCardProps {
   unit?: string;
   delta?: TrendDelta | null;
   deltaTone?: "emissions" | "neutral";
+  stacked?: boolean;
 }
 
 function deltaColorClass(direction: "up" | "down", tone: "emissions" | "neutral"): string {
@@ -14,16 +15,30 @@ function deltaColorClass(direction: "up" | "down", tone: "emissions" | "neutral"
   return direction === "down" ? "text-secondary" : "text-destructive";
 }
 
-export function KpiCard({ label, value, unit, delta, deltaTone = "neutral" }: KpiCardProps) {
+export function KpiCard({
+  label,
+  value,
+  unit,
+  delta,
+  deltaTone = "neutral",
+  stacked = false,
+}: KpiCardProps) {
   return (
     <div className="rounded-xl border border-border bg-background p-6">
       <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
         {label}
       </p>
-      <div className="mt-4 flex items-baseline gap-1.5">
-        <span className="text-3xl font-semibold text-primary">{value}</span>
-        {unit && <span className="text-sm text-muted-foreground">{unit}</span>}
-      </div>
+      {stacked ? (
+        <div className="mt-4">
+          <p className="wrap-break-word text-3xl font-semibold text-primary">{value}</p>
+          {unit && <p className="mt-1 text-sm text-muted-foreground">{unit}</p>}
+        </div>
+      ) : (
+        <div className="mt-4 flex items-baseline gap-1.5">
+          <span className="text-3xl font-semibold text-primary">{value}</span>
+          {unit && <span className="text-sm text-muted-foreground">{unit}</span>}
+        </div>
+      )}
       {delta && delta.direction !== "flat" && (
         <p
           className={`mt-2 flex items-center gap-1 text-sm font-medium ${deltaColorClass(delta.direction, deltaTone)}`}

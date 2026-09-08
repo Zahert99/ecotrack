@@ -67,6 +67,7 @@ export default function DashboardPage() {
             unit={`${companyQuery.data.employeeCount.toLocaleString()} ${
               companyQuery.data.employeeCount === 1 ? "employee" : "employees"
             }`}
+            stacked
           />
         )}
       </div>
