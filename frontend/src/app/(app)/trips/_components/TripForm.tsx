@@ -37,6 +37,9 @@ export function TripForm({ initialValues, submitLabel, helperText, onSubmit, onC
     initialValues ? String(initialValues.distanceKm) : "",
   );
   const [date, setDate] = useState(initialValues?.date ?? todayIsoDate());
+  const [passengerCount, setPassengerCount] = useState(
+    String(initialValues?.passengerCount ?? 1),
+  );
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -49,6 +52,7 @@ export function TripForm({ initialValues, submitLabel, helperText, onSubmit, onC
         transportType,
         fuelType: transportType === "CAR" ? fuelType : undefined,
         distanceKm: Number(distanceKm),
+        passengerCount: transportType === "CAR" ? undefined : Number(passengerCount),
         date,
       });
     } catch (err) {
@@ -133,6 +137,25 @@ export function TripForm({ initialValues, submitLabel, helperText, onSubmit, onC
         <div className="flex flex-col gap-1">
           <label className="text-sm font-medium text-muted-foreground">Fuel Type</label>
           <Select value={fuelType} options={FUEL_SELECT_OPTIONS} onChange={setFuelType} />
+        </div>
+      )}
+
+      {transportType !== "CAR" && (
+        <div className="flex flex-col gap-1">
+          <label htmlFor="passengerCount" className="text-sm font-medium text-muted-foreground">
+            Passengers
+          </label>
+          <input
+            id="passengerCount"
+            name="passengerCount"
+            type="number"
+            required
+            min="1"
+            step="1"
+            value={passengerCount}
+            onChange={(e) => setPassengerCount(e.target.value)}
+            className="w-full rounded border border-border bg-background px-3 py-2 text-foreground transition-colors focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+          />
         </div>
       )}
 

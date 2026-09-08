@@ -38,6 +38,9 @@ export function TripsTable({ trips, onDelete, onProposeEdit, deletingTripId, use
                 Distance (km)
               </th>
               <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                Passengers
+              </th>
+              <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                 CO2e
               </th>
               <th className="px-4 py-3"></th>
@@ -66,6 +69,9 @@ export function TripsTable({ trips, onDelete, onProposeEdit, deletingTripId, use
                   </td>
                   <td className="px-4 py-3 text-sm text-foreground">
                     {trip.distanceKm.toLocaleString()}
+                  </td>
+                  <td className="px-4 py-3 text-sm text-foreground">
+                    {trip.passengerCount.toLocaleString()}
                   </td>
                   <td className="px-4 py-3 text-sm font-semibold text-foreground">
                     {co2e.value} {co2e.unit}

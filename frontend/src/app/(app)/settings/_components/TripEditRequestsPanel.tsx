@@ -68,7 +68,7 @@ function RequestCard({
       </div>
 
       {trip ? (
-        <div className="grid grid-cols-2 gap-3 rounded-lg bg-muted p-3 lg:grid-cols-4">
+        <div className="grid grid-cols-2 gap-3 rounded-lg bg-muted p-3 lg:grid-cols-5">
           <DiffField
             label="Transport"
             current={TRANSPORT_LABELS[trip.transportType]}
@@ -83,6 +83,11 @@ function RequestCard({
             label="Distance (km)"
             current={trip.distanceKm.toLocaleString()}
             proposed={request.proposedDistanceKm.toLocaleString()}
+          />
+          <DiffField
+            label="Passengers"
+            current={trip.passengerCount.toLocaleString()}
+            proposed={request.proposedPassengerCount.toLocaleString()}
           />
           <DiffField label="Date" current={formatDate(trip.date)} proposed={formatDate(request.proposedDate)} />
         </div>

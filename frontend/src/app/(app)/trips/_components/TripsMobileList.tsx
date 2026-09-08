@@ -65,6 +65,12 @@ export function TripsMobileList({
                   {trip.distanceKm.toLocaleString()} km
                 </span>
               </div>
+              <div>
+                <span className="block text-xs text-muted-foreground">Passengers</span>
+                <span className="text-sm font-medium text-foreground">
+                  {trip.passengerCount.toLocaleString()}
+                </span>
+              </div>
               <div className="text-right">
                 <span className="block text-xs text-muted-foreground">Total Impact</span>
                 <span className="text-lg font-bold text-primary">
