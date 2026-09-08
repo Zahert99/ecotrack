@@ -53,7 +53,13 @@ export async function createTrip(
   requester: Requester,
   input: TripInput,
 ): Promise<Trip> {
-  const co2eKg = await calculateCo2eKg(pool, input.transportType, input.fuelType, input.distanceKm);
+  const co2eKg = await calculateCo2eKg(
+    pool,
+    input.transportType,
+    input.fuelType,
+    input.distanceKm,
+    input.passengerCount,
+  );
   return insertTrip(pool, companyId, {
     userId: requester.userId,
     transportType: input.transportType,
@@ -88,7 +94,13 @@ export async function updateTrip(
   input: TripInput,
 ): Promise<Trip> {
   await assertAccessible(companyId, requester, tripId);
-  const co2eKg = await calculateCo2eKg(pool, input.transportType, input.fuelType, input.distanceKm);
+  const co2eKg = await calculateCo2eKg(
+    pool,
+    input.transportType,
+    input.fuelType,
+    input.distanceKm,
+    input.passengerCount,
+  );
   const updated = await updateTripRow(pool, companyId, tripId, {
     transportType: input.transportType,
     fuelType: input.fuelType,

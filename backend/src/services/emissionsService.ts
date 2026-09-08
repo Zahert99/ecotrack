@@ -8,6 +8,7 @@ export async function calculateCo2eKg(
   transportType: TransportType,
   fuelType: FuelType | null,
   distanceKm: number,
+  passengerCount: number = 1,
 ): Promise<number> {
   const factor = await findEmissionFactor(client, transportType, fuelType);
   if (factor === null) {
@@ -17,5 +18,9 @@ export async function calculateCo2eKg(
       `No emission factor configured for ${transportType}${fuelType ? `/${fuelType}` : ''}`,
     );
   }
-  return Math.round(distanceKm * factor * 10000) / 10000;
+  const calculated =
+    factor.unit === 'passenger_km'
+      ? distanceKm * passengerCount * factor.factorKgPerKm
+      : distanceKm * factor.factorKgPerKm;
+  return Math.round(calculated * 10000) / 10000;
 }

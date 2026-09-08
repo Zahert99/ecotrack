@@ -138,6 +138,7 @@ export async function resolve(
         existing.proposedTransportType,
         existing.proposedFuelType,
         existing.proposedDistanceKm,
+        existing.proposedPassengerCount,
       );
       const updated = await updateTrip(client, companyId, existing.tripId, {
         transportType: existing.proposedTransportType,
