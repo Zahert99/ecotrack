@@ -7,24 +7,23 @@ import {
   Tooltip,
   type TooltipItem,
 } from "chart.js";
+import { useTheme } from "next-themes";
 import { Doughnut } from "react-chartjs-2";
 import type { TransportBreakdown } from "@/types/api";
+import { useThemeCssVars } from "@/components/chartColors";
 import { formatCo2e, TRANSPORT_COLORS, TRANSPORT_LABELS } from "./formatters";
 
 ChartJS.register(ArcElement, Tooltip);
 
-function readCssVar(name: string): string {
-  if (typeof window === "undefined") return "#000000";
-  return getComputedStyle(document.documentElement)
-    .getPropertyValue(name)
-    .trim();
-}
+const TRANSPORT_COLOR_VARS = Object.values(TRANSPORT_COLORS);
 
 export function TransportBreakdownChart({
   breakdown,
 }: {
   breakdown: TransportBreakdown[];
 }) {
+  const { resolvedTheme } = useTheme();
+  const colors = useThemeCssVars(TRANSPORT_COLOR_VARS);
   const total = breakdown.reduce((sum, entry) => sum + entry.co2eKg, 0);
 
   const { data, options } = useMemo(() => {
@@ -34,8 +33,8 @@ export function TransportBreakdownChart({
         datasets: [
           {
             data: breakdown.map((entry) => entry.co2eKg),
-            backgroundColor: breakdown.map((entry) =>
-              readCssVar(TRANSPORT_COLORS[entry.transportType]),
+            backgroundColor: breakdown.map(
+              (entry) => colors[TRANSPORT_COLORS[entry.transportType]],
             ),
             borderWidth: 0,
           },
@@ -56,14 +55,14 @@ export function TransportBreakdownChart({
         },
       },
     };
-  }, [breakdown]);
+  }, [breakdown, colors]);
 
   const totalFormatted = formatCo2e(total);
 
   return (
     <div className='flex flex-col items-center gap-6 md:flex-row md:items-start'>
       <div className='relative h-48 w-48 shrink-0'>
-        <Doughnut data={data} options={options} />
+        <Doughnut key={resolvedTheme} data={data} options={options} />
         <div className='pointer-events-none absolute inset-0 flex flex-col items-center justify-center'>
           <span className='text-2xl font-semibold text-foreground'>
             {totalFormatted.value}

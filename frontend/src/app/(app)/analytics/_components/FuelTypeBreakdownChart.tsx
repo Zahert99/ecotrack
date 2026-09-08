@@ -9,21 +9,26 @@ import {
   Tooltip,
   type TooltipItem,
 } from "chart.js";
+import { useTheme } from "next-themes";
 import { Bar } from "react-chartjs-2";
 import type { FuelBreakdown } from "@/types/api";
+import { useThemeCssVars } from "@/components/chartColors";
 import { formatCo2e, FUEL_COLORS, FUEL_LABELS } from "./formatters";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip);
 
-function readCssVar(name: string): string {
-  if (typeof window === "undefined") return "#000000";
-  return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
-}
+const FUEL_COLOR_VARS = [...new Set(Object.values(FUEL_COLORS))].concat([
+  "--muted-foreground",
+  "--border",
+]);
 
 export function FuelTypeBreakdownChart({ breakdown }: { breakdown: FuelBreakdown[] }) {
+  const { resolvedTheme } = useTheme();
+  const colors = useThemeCssVars(FUEL_COLOR_VARS);
+
   const { data, options } = useMemo(() => {
-    const mutedForeground = readCssVar("--muted-foreground");
-    const border = readCssVar("--border");
+    const mutedForeground = colors["--muted-foreground"];
+    const border = colors["--border"];
 
     return {
       data: {
@@ -32,7 +37,7 @@ export function FuelTypeBreakdownChart({ breakdown }: { breakdown: FuelBreakdown
           {
             label: "CO2e (kg)",
             data: breakdown.map((entry) => entry.co2eKg),
-            backgroundColor: breakdown.map((entry) => readCssVar(FUEL_COLORS[entry.fuelType])),
+            backgroundColor: breakdown.map((entry) => colors[FUEL_COLORS[entry.fuelType]]),
             borderRadius: 4,
             maxBarThickness: 48,
           },
@@ -59,11 +64,11 @@ export function FuelTypeBreakdownChart({ breakdown }: { breakdown: FuelBreakdown
         },
       },
     };
-  }, [breakdown]);
+  }, [breakdown, colors]);
 
   return (
     <div className="h-64 w-full min-w-80">
-      <Bar data={data} options={options} />
+      <Bar key={resolvedTheme} data={data} options={options} />
     </div>
   );
 }

@@ -10,27 +10,27 @@ import {
   Tooltip,
   type TooltipItem,
 } from "chart.js";
+import { useTheme } from "next-themes";
 import { Bar } from "react-chartjs-2";
 import type { QuarterlyComparison } from "@/types/api";
+import { useThemeCssVars } from "@/components/chartColors";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend);
 
-function readCssVar(name: string): string {
-  if (typeof window === "undefined") return "#000000";
-  return getComputedStyle(document.documentElement)
-    .getPropertyValue(name)
-    .trim();
-}
+const COLOR_VARS = ["--primary", "--muted-foreground", "--border"];
 
 export function QuarterlyComparisonChart({
   comparison,
 }: {
   comparison: QuarterlyComparison[];
 }) {
+  const { resolvedTheme } = useTheme();
+  const colors = useThemeCssVars(COLOR_VARS);
+
   const { data, options } = useMemo(() => {
-    const primary = readCssVar("--primary");
-    const mutedForeground = readCssVar("--muted-foreground");
-    const border = readCssVar("--border");
+    const primary = colors["--primary"];
+    const mutedForeground = colors["--muted-foreground"];
+    const border = colors["--border"];
 
     return {
       data: {
@@ -77,11 +77,11 @@ export function QuarterlyComparisonChart({
         },
       },
     };
-  }, [comparison]);
+  }, [comparison, colors]);
 
   return (
     <div className='h-64 w-full min-w-80'>
-      <Bar data={data} options={options} />
+      <Bar key={resolvedTheme} data={data} options={options} />
     </div>
   );
 }

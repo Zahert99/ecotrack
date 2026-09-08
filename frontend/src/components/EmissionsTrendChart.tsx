@@ -9,8 +9,10 @@ import {
   Tooltip,
   type TooltipItem,
 } from "chart.js";
+import { useTheme } from "next-themes";
 import { Bar } from "react-chartjs-2";
 import type { MonthlyTrend } from "@/types/api";
+import { useThemeCssVars } from "./chartColors";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip);
 
@@ -35,18 +37,14 @@ function formatMonthLabel(month: string): string {
   return MONTH_LABELS[index] ?? month;
 }
 
-function readCssVar(name: string): string {
-  // Canvas can't read CSS variables directly; getComputedStyle needs `document`,
-  // which isn't available during SSR — the fallback never actually paints.
-  if (typeof window === "undefined") return "#000000";
-  return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
-}
-
 export function EmissionsTrendChart({ trends }: { trends: MonthlyTrend[] }) {
+  const { resolvedTheme } = useTheme();
+  const colors = useThemeCssVars(["--primary", "--border", "--muted-foreground"]);
+
   const { data, options } = useMemo(() => {
-    const primary = readCssVar("--primary");
-    const border = readCssVar("--border");
-    const mutedForeground = readCssVar("--muted-foreground");
+    const primary = colors["--primary"];
+    const border = colors["--border"];
+    const mutedForeground = colors["--muted-foreground"];
 
     return {
       data: {
@@ -86,11 +84,11 @@ export function EmissionsTrendChart({ trends }: { trends: MonthlyTrend[] }) {
         },
       },
     };
-  }, [trends]);
+  }, [trends, colors]);
 
   return (
     <div className="h-64 w-full min-w-120">
-      <Bar data={data} options={options} />
+      <Bar key={resolvedTheme} data={data} options={options} />
     </div>
   );
 }

@@ -9,29 +9,30 @@ import {
   Tooltip,
   type TooltipItem,
 } from "chart.js";
+import { useTheme } from "next-themes";
 import { Bar } from "react-chartjs-2";
 import type { TransportBreakdown } from "@/types/api";
+import { useThemeCssVars } from "@/components/chartColors";
 import { TRANSPORT_LABELS } from "./formatters";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip);
 
-function readCssVar(name: string): string {
-  if (typeof window === "undefined") return "#000000";
-  return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
-}
-
 type EfficiencyMetric = "perKm" | "perPassenger";
+
+const COLOR_VARS = ["--primary", "--secondary", "--muted-foreground", "--border"];
 
 export function EfficiencyByModeChart({ breakdown }: { breakdown: TransportBreakdown[] }) {
   const [metric, setMetric] = useState<EfficiencyMetric>("perKm");
+  const { resolvedTheme } = useTheme();
+  const colors = useThemeCssVars(COLOR_VARS);
 
   const { data, options } = useMemo(() => {
     const values = breakdown.map((entry) =>
       metric === "perKm" ? entry.co2eKg / entry.distanceKm : entry.co2eKg / entry.passengerCount,
     );
-    const barColor = readCssVar(metric === "perKm" ? "--primary" : "--secondary");
-    const mutedForeground = readCssVar("--muted-foreground");
-    const border = readCssVar("--border");
+    const barColor = colors[metric === "perKm" ? "--primary" : "--secondary"];
+    const mutedForeground = colors["--muted-foreground"];
+    const border = colors["--border"];
     const unit = metric === "perKm" ? "kg/km" : "kg/passenger";
 
     return {
@@ -64,7 +65,7 @@ export function EfficiencyByModeChart({ breakdown }: { breakdown: TransportBreak
         },
       },
     };
-  }, [breakdown, metric]);
+  }, [breakdown, metric, colors]);
 
   return (
     <div>
@@ -93,7 +94,7 @@ export function EfficiencyByModeChart({ breakdown }: { breakdown: TransportBreak
         </button>
       </div>
       <div className="h-64 w-full min-w-80">
-        <Bar data={data} options={options} />
+        <Bar key={resolvedTheme} data={data} options={options} />
       </div>
     </div>
   );
