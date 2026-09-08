@@ -3,12 +3,12 @@
 // Real seeded emission factors (kg CO2e / km) — same numbers the actual
 // /analytics Efficiency by Transport Mode chart is built from.
 const ROWS = [
-  { key: "FLIGHT", label: "Flight", value: 0.255 },
-  { key: "CAR_PETROL", label: "Car (Petrol)", value: 0.192 },
-  { key: "CAR_ELECTRIC", label: "Car (Electric)", value: 0.053 },
-  { key: "TRAIN", label: "Train", value: 0.041 },
+  { key: "CAR_PETROL", label: "Car (Petrol)", value: 0.165 },
+  { key: "FLIGHT", label: "Flight", value: 0.136 },
+  { key: "CAR_ELECTRIC", label: "Car (Electric)", value: 0.025 },
+  { key: "TRAIN", label: "Train", value: 0.007 },
 ];
-const MAX_VALUE = 0.255;
+const MAX_VALUE = 0.165;
 
 function Bar({ label, value, active }: { label: string; value: number; active: boolean }) {
   return (
